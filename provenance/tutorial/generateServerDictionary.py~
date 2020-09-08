@@ -1,0 +1,34 @@
+import os
+import sys
+import json
+
+def generateFileDictionary(directoryToIndex):
+    nameToPathDictionary = {}
+    nameToIDDictionary = {}
+    IDToNameDictionary = {}
+    count = 0
+    print("searching " + directoryToIndex)
+    notfindFileTypes = True
+    for root, dirs, files in os.walk(directoryToIndex,followlinks=True):
+        dlength = len(dirs)
+        for file in files:
+            fileID = file.split('.')[0]
+            if notfindFileTypes or file.endswith('.npy'):
+
+                if fileID not in nameToPathDictionary:
+                    nameToPathDictionary[fileID] = os.path.join(os.path.abspath(root),file)
+                    count += 1
+                else:
+                    pass
+                    # print('file already exists, skip')
+                if count%1000 == 0:
+                    print(str(count)+"/"+str(dlength))
+    nameToPathDictionary["_rootDirectory_"] = os.path.abspath(directoryToIndex)
+    return nameToPathDictionary
+
+dirPath = sys.argv[1]
+
+serverDict = generateFileDictionary(dirPath)
+outputPath = os.path.join(dirPath,"serverDict.json")
+with open(outputPath,'w') as f:
+    json.dump(serverDict,f)

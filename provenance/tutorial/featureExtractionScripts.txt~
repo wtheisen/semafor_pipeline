@@ -1,0 +1,1 @@
+python3.6 featureExtractionDriver.py --NISTWorldIndex /media/jbrogan4/scratch0/medifor/datasets/Nimble/NC2017_Dev1_Beta4/indexes/NC2017_Dev1-provenancefiltering-world.csv --NISTDataset /media/jbrogan4/scratch0/medifor/datasets/Nimble/NC2017_Dev1_Beta4/ --outputdir /media/jbrogan4/scratch2/Medifor/Features/NC2017_Dev1_Beta4_1000_DELF_kp --numJobs 2 --jobNum 0
