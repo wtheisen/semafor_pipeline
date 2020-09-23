@@ -86,12 +86,17 @@ elif args.GenericProbeList is not None:
     with open(args.GenericProbeList) as f:
       lines = f.readlines()
 numcores = 1
+print(args.outputdir)
+print("beginning dist query")
 distQuery = distributedQuery(args.IndexOutputDir, os.path.join(args.NISTDataset, "world"),indexServerAddress=args.IndexServerAddress,indexServerPort=args.IndexServerPort,tmpDir=args.CacheFolder,indexParamFile=args.TrainedIndexParams,useServer=useServer,det=args.det,desc=args.desc,savefolder=args.outputdir)
+print("after dist query")
 provenanceFilter = provenanceFiltering(distQuery)
+print('after provenancefilter')
 #provenanceFilter = None
 count = 0
 from tqdm import tqdm
 for line in tqdm(lines[int(args.Offset):]):
+    print("line", line)
     if count == 0:
         filepath = '/media/jbrogan4/bill/Pictures/InstagramImages/jokowilagi/51045154_603997083357112_1048945291012894074_n.jpg'
 

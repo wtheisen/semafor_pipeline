@@ -45,8 +45,9 @@ class queryIndex:
     # resultSaveFolder = os.path.join('/media/wtheisen/scratch2/4chan_phash/','fdump')
     #resultSaveFolder = os.path.join('/media/wtheisen/scratch2/Indonesia_Retry','fdump')
     # resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_vgg','fdump')
-    resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_phash','fdump')
+    #resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_phash','fdump')
     #resultSaveFolder = os.path.join('/scratch365/jbrogan4/eval19/','fdump')
+    resultSaveFolder = os.path.join('/home/pthomas4/semafor/media/pthomas4/scratch2/indo_vgg', 'fdump')
     msaveFolder = os.path.join(resultSaveFolder,'matrices')
     fsaveFolder = os.path.join(resultSaveFolder,'features')
     index=None
@@ -113,7 +114,7 @@ class queryIndex:
                 sizeFile = os.path.join(indexFileResource ,'imagesizes.diskarray')
 
 
-                self.IDToImage = dbm.open(dbfile,'rc')
+                self.IDToImage = dbm.open(dbfile,'c')
                 if 'metaDataDim' in self.IDToImage:
                     self.metadatadimensions = int(self.IDToImage['metaDataDim'])
                     print('stored metadata dimensions: ',self.metadatadimensions)

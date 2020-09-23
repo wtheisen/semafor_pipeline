@@ -37,6 +37,7 @@ outputName = sys.argv[2]
 serverDict,fileList = generateFileDictionary(dirPathList)
 outputPath = os.path.join(outputName+"_pathmap.json")
 outputListPath = os.path.join(outputName+"_filelist.txt")
+print(outputPath)
 with open(outputPath,'w') as f:
     json.dump(serverDict,f)
 with open(outputListPath,'w') as fp:

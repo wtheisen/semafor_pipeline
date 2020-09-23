@@ -39,13 +39,13 @@ class featureExtraction:
 
           #extract data
           filename  = worldImage.key
-          print('fname: ,',filename)
           imagedata  = worldImage._data
           image = self.deserialize_image(imagedata,resourcepath=resourcepath).astype(np.uint8)
           if downsize or image.shape[0]*image.shape[1] > 16777216*3:
               print('downsizing')
               image = self.downSize(image)
-          if image is not None:
+          try:
+           if image is not None:
               if flip:
                   image = cv2.flip(image,0)
               #extract your features, in this example color histograms
@@ -56,7 +56,6 @@ class featureExtraction:
                                                 default_params=True,tfcores=tfcores)
               # print(f'DAT STRUCT: {featuresStruct}')
               features = featuresStruct[1]
-              # print(f'FEATS: {features}')
               meta = np.zeros((features.shape[0],4))
               i = 0
               #get location,size,and angle data of all keypoints
@@ -76,6 +75,8 @@ class featureExtraction:
               # print(f'FEATS BEFORE CEREAL: {features}')
               featureResource = Resource(filename, self.serializeFeature(features,w=image.shape[1],h=image.shape[0]), 'application/octet-stream')
               return self.createOutput(featureResource)
+          except:
+              print("Problem with", filename)
           return None
 
       #creates the API struct

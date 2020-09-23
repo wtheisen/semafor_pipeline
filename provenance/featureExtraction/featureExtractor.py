@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-#from delf import delf_config_pb2,feature_extractor
+# from delf import delf_config_pb2,feature_extractor
 
 
 import sys
@@ -15,8 +15,8 @@ import subprocess
 import traceback
 from skimage.feature import local_binary_pattern
 from extractAngles import getAnglesFromKeypoints
-#from google.protobuf import text_format
-#from tensorflow.python.platform import app
+# from google.protobuf import text_format
+# from tensorflow.python.platform import app
 
 import cv2
 import imagehash
@@ -35,17 +35,25 @@ distanceThreshold = 50
 
 _STATUS_CHECK_ITERATIONS = 100
 config_path = '/home/jbrogan4/Documents/Projects/Medifor/tensorflow/models/research/delf/delf/python/examples/delf_config_example.pbtxt'
-#config_path = '/scratch365/jbrogan4/models/research/delf/delf/python/examples/delf_config_example.pbtxt'
+# config_path = '/scratch365/jbrogan4/models/research/delf/delf/python/examples/delf_config_example.pbtxt'
 try:
     config = delf_config_pb2.DelfConfig()
     with tf.gfile.FastGFile(config_path, 'r') as f:
         text_format.Merge(f.read(), config)
 except:
     print('no DELF')
+
+
 def isRaw(imgname):
-    return imgname.endswith('.raw') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith('.cr2')
+    return imgname.endswith('.raw') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith(
+        '.cr2') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith('.cr2') or imgname.endswith(
+        '.cr2')
+
+
 def usage():
     print("extracts features")
+
+
 def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_descriptor=False, default_params=True):
     """ Sparsely detects local detection in an image.
 
@@ -74,13 +82,14 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             if default_params:
                 surf = cv2.xfeatures2d.SURF_create()
             else:
-                #print("SURF: hessianThreshold = {0}".format(hessianThreshold))
-                #print("SURF: nOctaves = {0}".format(nOctaves))
-                #print("SURF: nOctaveLayers = {0}".format(nOctaveLayers))
-                #print("Image Size: ",img.shape)
+                # print("SURF: hessianThreshold = {0}".format(hessianThreshold))
+                # print("SURF: nOctaves = {0}".format(nOctaves))
+                # print("SURF: nOctaveLayers = {0}".format(nOctaveLayers))
+                # print("Image Size: ",img.shape)
                 sys.stdout.flush()
 
-                surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
+                surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves,
+                                                   nOctaveLayers=nOctaveLayers,
                                                    extended=extended, upright=upright)
 
             st_t = time.time()
@@ -91,18 +100,19 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             n_cols = ns[1]
 
             step_size = 5
-            y_step_size = max(1,n_rows // 35)
-            x_step_size = max(1,n_cols // 35)
+            y_step_size = max(1, n_rows // 35)
+            x_step_size = max(1, n_cols // 35)
 
-            if (len(keypoints_surf) < (0.1*kmax)) or dense_descriptor:
-                keypoints_dense = [cv2.KeyPoint(x, y, max(y_step_size, x_step_size)) for y in range(0, img.shape[0], y_step_size) for x in range(0, img.shape[1], x_step_size)]
+            if (len(keypoints_surf) < (0.1 * kmax)) or dense_descriptor:
+                keypoints_dense = [cv2.KeyPoint(x, y, max(y_step_size, x_step_size)) for y in
+                                   range(0, img.shape[0], y_step_size) for x in range(0, img.shape[1], x_step_size)]
                 r_state = np.random.RandomState(7)
                 keypoints_dense = list(r_state.permutation(keypoints_dense))
 
                 print("Computing Dense Descriptor instead...", len(keypoints_dense))
                 sys.stdout.flush()
 
-                keypoints = keypoints_dense[0:kmax//2] + keypoints_surf
+                keypoints = keypoints_dense[0:kmax // 2] + keypoints_surf
 
             else:
                 keypoints = keypoints_surf
@@ -114,8 +124,9 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
         elif detetype == "SURF3":
             st_t = time.time()
             # detects the SURF keypoints, with very low Hessian threshold
-            surfDetectorDescriptor = cv2.xfeatures2d.SURF_create(hessianThreshold=10, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
-                                                   extended=extended, upright=upright)
+            surfDetectorDescriptor = cv2.xfeatures2d.SURF_create(hessianThreshold=10, nOctaves=nOctaves,
+                                                                 nOctaveLayers=nOctaveLayers,
+                                                                 extended=extended, upright=upright)
             keypoints = surfDetectorDescriptor.detect(img, mask)
 
             # sorts the keypoints according to their Hessian value
@@ -133,7 +144,7 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
 
             if len(keypoints) > 0:
                 # keeps the top-n strongest keypoints
-                for i in range(min(keepTopNCount,len(keypoints))):
+                for i in range(min(keepTopNCount, len(keypoints))):
                     selectedKeypoints.append(keypoints[i])
                     selectedPositions.append(positions[i])
 
@@ -164,8 +175,9 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             ed_t = time.time()
         elif detetype == "SURF2":
             st_t = time.time()
-            surfDetectorDescriptor = cv2.xfeatures2d.SURF_create(hessianThreshold=10, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
-                                                   extended=extended, upright=upright)
+            surfDetectorDescriptor = cv2.xfeatures2d.SURF_create(hessianThreshold=10, nOctaves=nOctaves,
+                                                                 nOctaveLayers=nOctaveLayers,
+                                                                 extended=extended, upright=upright)
             keypoints = surfDetectorDescriptor.detect(img, mask)
 
             # sorts the keypoints according to their Hessian value
@@ -183,7 +195,7 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
 
             if len(keypoints) > 0:
                 # keeps the top-n strongest keypoints
-                for i in range(min(keepTopNCount,len(keypoints))):
+                for i in range(min(keepTopNCount, len(keypoints))):
                     selectedKeypoints.append(keypoints[i])
                     selectedPositions.append(positions[i])
 
@@ -196,7 +208,7 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
                 # adds the remaining keypoints, avoiding collisions to the already selected ones
                 if len(selectedKeypoints) < kmax:
                     matcher = cv2.BFMatcher()
-                    for i in range(min(keepTopNCount,len(keypoints)), positions.shape[0]):
+                    for i in range(min(keepTopNCount, len(keypoints)), positions.shape[0]):
                         currentPosition = [positions[i]]
                         currentPosition = np.array(currentPosition)
 
@@ -219,8 +231,9 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             ed_t = time.time()
         elif detetype == "SURF4":
             # detects the SURF keypoints
-            surfDetectorDescriptor = cv2.xfeatures2d.SURF_create(hessianThreshold=10, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
-                                                   extended=extended, upright=upright)
+            surfDetectorDescriptor = cv2.xfeatures2d.SURF_create(hessianThreshold=10, nOctaves=nOctaves,
+                                                                 nOctaveLayers=nOctaveLayers,
+                                                                 extended=extended, upright=upright)
             keypoints = surfDetectorDescriptor.detect(img, mask)
 
             # describes the obtained keypoints
@@ -243,7 +256,7 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             # print(f'YEET: {imgpath}')
             st_t = time.time()
             h, w, d = img.shape
-            x_center, y_center = int(w/2), int(h/2)
+            x_center, y_center = int(w / 2), int(h / 2)
             keypoints = [cv2.KeyPoint(x=x_center, y=y_center, _size=1, _angle=0)]
             ed_t = time.time()
 
@@ -251,7 +264,7 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             # print(f'YEET: {imgpath}')
             st_t = time.time()
             h, w, d = img.shape
-            x_center, y_center = int(w/2), int(h/2)
+            x_center, y_center = int(w / 2), int(h / 2)
             keypoints = [cv2.KeyPoint(x=x_center, y=y_center, _size=1, _angle=0)]
             ed_t = time.time()
 
@@ -302,7 +315,7 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             if kmax != -1:
                 keypoints = keypoints[0:kmax]
 
-        elif detetype =="MSER_comp":
+        elif detetype == "MSER_comp":
             ## This function takes two colored images as input and returns a similarity value
             def mserCompHist(img1, img2):
                 mser = cv2.MSER()
@@ -366,7 +379,8 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             gsImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
             # creates a mask to ignore eventual black borders
-            _, bMask = cv2.threshold(cv2.normalize(gsImage, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX), 1, 255, cv2.THRESH_BINARY)
+            _, bMask = cv2.threshold(cv2.normalize(gsImage, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX), 1, 255,
+                                     cv2.THRESH_BINARY)
             bMask = cv2.convertScaleAbs(bMask)
 
             # combines the border mask to an eventual given mask
@@ -405,7 +419,8 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
                 print('-- MSER: DID NOT FOUND ANY KEYPOINT!')
                 sys.stdout.flush()
 
-                surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
+                surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves,
+                                                   nOctaveLayers=nOctaveLayers,
                                                    extended=extended, upright=upright)
 
                 keypoints = surf.detect(img, mask)
@@ -421,8 +436,9 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
 
             st_t = time.time()
 
-            surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
-                                                   extended=extended, upright=upright)
+            surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves,
+                                               nOctaveLayers=nOctaveLayers,
+                                               extended=extended, upright=upright)
 
             keypoints_surf = surf.detect(img, mask)
 
@@ -432,7 +448,8 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             gsImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
             # creates a mask to ignore eventual black borders
-            _, bMask = cv2.threshold(cv2.normalize(gsImage, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX), 1, 255, cv2.THRESH_BINARY)
+            _, bMask = cv2.threshold(cv2.normalize(gsImage, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX), 1, 255,
+                                     cv2.THRESH_BINARY)
             bMask = cv2.convertScaleAbs(bMask)
 
             # combines the border mask to an eventual given mask
@@ -461,12 +478,11 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
             keypoints_mser = list(r_state.permutation(keypoints_mser))
 
             if len(keypoints_mser) < len(keypoints_surf):
-                keypoints_mser = keypoints_mser[0:kmax//2]
+                keypoints_mser = keypoints_mser[0:kmax // 2]
                 keypoints_surf = keypoints_surf[:kmax - len(keypoints_mser)]
             else:
-                keypoints_surf = keypoints_surf[0:kmax//2]
+                keypoints_surf = keypoints_surf[0:kmax // 2]
                 keypoints_mser = keypoints_mser[:kmax - len(keypoints_surf)]
-
 
             print('-- MSER: NUMBER OF KEYPOINTS', len(keypoints_mser))
             print('-- SURF: NUMBER OF KEYPOINTS', len(keypoints_surf))
@@ -492,7 +508,8 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
         traceback.print_exception(e_type, e_val, e_tb)
         return [], -1
 
-def local_feature_description(imgpath, img, keypoints, desctype, default_params=True,tfcores=1):
+
+def local_feature_description(imgpath, img, keypoints, desctype, default_params=True, tfcores=1):
     """ Describes the given keypoints of an image.
 
     OpenCV implementation of various descriptors.
@@ -511,14 +528,15 @@ def local_feature_description(imgpath, img, keypoints, desctype, default_params=
             if default_params:
                 surf = cv2.xfeatures2d.SURF_create()
             else:
-                #print("SURF: hessianThreshold = {0}".format(hessianThreshold))
-                #print("SURF: nOctaves = {0}".format(nOctaves))
-                #print("SURF: nOctaveLayers = {0}".format(nOctaveLayers))
+                # print("SURF: hessianThreshold = {0}".format(hessianThreshold))
+                # print("SURF: nOctaves = {0}".format(nOctaves))
+                # print("SURF: nOctaveLayers = {0}".format(nOctaveLayers))
                 sys.stdout.flush()
 
-                surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
+                surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves,
+                                                   nOctaveLayers=nOctaveLayers,
                                                    extended=extended, upright=upright)
-                #print('got here 3')
+                # print('got here 3')
             st_t = time.time()
             __, features = surf.compute(img, keypoints)
             ed_t = time.time()
@@ -534,24 +552,24 @@ def local_feature_description(imgpath, img, keypoints, desctype, default_params=
             radius = 5
             n_points = 64
             if len(img.shape) > 2 and img.shape[2] > 1:
-                gs = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+                gs = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             else:
                 gs = img
-            features = np.zeros((len(keypoints),n_points))
+            features = np.zeros((len(keypoints), n_points))
             i = 0
             for kp in keypoints:
-                neighborhoodSize = max(kp.size,30)
-                top = max(0,kp.pt[1]-int(neighborhoodSize/2))
-                bottom = min(img.shape[0],kp.pt[1]+int(neighborhoodSize/2))
-                left = max(0,kp.pt[0]-int(neighborhoodSize/2))
+                neighborhoodSize = max(kp.size, 30)
+                top = max(0, kp.pt[1] - int(neighborhoodSize / 2))
+                bottom = min(img.shape[0], kp.pt[1] + int(neighborhoodSize / 2))
+                left = max(0, kp.pt[0] - int(neighborhoodSize / 2))
                 right = min(img.shape[1], kp.pt[0] + int(neighborhoodSize / 2))
-                gspatch = gs[top:bottom,left:right]
-                radius = max(2,min(radius,np.floor(gspatch.shape[0]/2),np.floor(gspatch.shape[1]/2)))
-                lbp,dsc_t = local_binary_pattern(gspatch,n_points,radius,'uniform')
+                gspatch = gs[top:bottom, left:right]
+                radius = max(2, min(radius, np.floor(gspatch.shape[0] / 2), np.floor(gspatch.shape[1] / 2)))
+                lbp, dsc_t = local_binary_pattern(gspatch, n_points, radius, 'uniform')
                 h = np.histogram(lbp, normed=True, bins=n_points, range=(0, int(lbp.max() + 1)))
-                h_norm = (h[0]*1.0)/np.sum(h[0])
-                features[i,:] = h_norm
-                i +=1
+                h_norm = (h[0] * 1.0) / np.sum(h[0])
+                features[i, :] = h_norm
+                i += 1
 
         elif desctype == "KAZE":
             # surf = cv2.xfeatures2d.SURF_create(hessianThreshold=hessianThreshold, nOctaves=nOctaves, nOctaveLayers=nOctaveLayers,
@@ -571,7 +589,7 @@ def local_feature_description(imgpath, img, keypoints, desctype, default_params=
             ed_t = time.time()
 
         elif desctype == "VGG":
-            #print('DOIN DAT VGG BB')
+            # print('DOIN DAT VGG BB')
             import tensorflow as tf
             from keras import backend as kBackend
             from keras.preprocessing import image
@@ -580,14 +598,14 @@ def local_feature_description(imgpath, img, keypoints, desctype, default_params=
 
             core_config = tf.ConfigProto()
             core_config.gpu_options.allow_growth = True
-            session = tf.Session(config = core_config)
+            session = tf.Session(config=core_config)
             kBackend.set_session(session)
 
             m = VGG19(weights='imagenet', include_top=False, pooling='avg')
             # m = VGG19(weights='imagenet', include_top=False)
 
             st_t = time.time()
-            
+
             i = image.load_img(imgpath, target_size=(244, 244))
             i_data = image.img_to_array(i)
             i_data = np.expand_dims(i_data, axis=0)
@@ -651,7 +669,7 @@ def local_feature_description(imgpath, img, keypoints, desctype, default_params=
 
                     # Extract and save features.
                     if len(img.shape) < 3:
-                        img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+                        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
                     (newkeypoints, features, feature_scales_out,
                      attention_out) = sess.run(
                         [locations, descriptors, feature_scales, attention],
@@ -666,10 +684,10 @@ def local_feature_description(imgpath, img, keypoints, desctype, default_params=
                                 config.delf_local_config.max_feature_num
                         })
                     kpList = []
-                    for i in range(0,newkeypoints.shape[0]):
-                        kpList.append(cv2.KeyPoint(newkeypoints[i][1],newkeypoints[i][0],feature_scales_out[i]))
+                    for i in range(0, newkeypoints.shape[0]):
+                        kpList.append(cv2.KeyPoint(newkeypoints[i][1], newkeypoints[i][0], feature_scales_out[i]))
                     try:
-                        newkeypoints = getAnglesFromKeypoints(img,kpList,patchSize=150)
+                        newkeypoints = getAnglesFromKeypoints(img, kpList, patchSize=150)
                     except:
                         print('could not extract angles')
                     # Finalize enqueue threads.
@@ -727,19 +745,21 @@ def local_feature_description(imgpath, img, keypoints, desctype, default_params=
             features = []
 
         dsc_t = ed_t - st_t
-        #print(features)
-        #print('HEY BB: ', features.shape)
-        return features, dsc_t, 1,newkeypoints
+        # print(features)
+        # print('HEY BB: ', features.shape)
+        return features, dsc_t, 1, newkeypoints
 
     else:
         print("Failure in describing the keypoints")
         sys.stdout.flush()
         e_type, e_val, e_tb = sys.exc_info()
         traceback.print_exception(e_type, e_val, e_tb)
-        return [], -1, 0,[]
+        return [], -1, 0, []
 
-def local_feature_detection_and_description(imgpath, detetype, desctype, kmax=500, img=[], mask=None, dense_descriptor=False,
-                                            default_params=True,tfcores=1):
+
+def local_feature_detection_and_description(imgpath, detetype, desctype, kmax=500, img=[], mask=None,
+                                            dense_descriptor=False,
+                                            default_params=True, tfcores=1):
     """ Given a path or an image, detects and describes local detection.
 
     :param default_params:
@@ -755,58 +775,61 @@ def local_feature_detection_and_description(imgpath, detetype, desctype, kmax=50
     if img == []:
         # print(f'Attempting to load: {imgpath}')
         try:
-                if imgpath.endswith('.gif'):
-                    img = misc.imread(imgpath)
-                else:
-                    img = cv2.imread(imgpath)
-                if img is None or img == []:
-                    print("Could not open with OpenCV, trying raw codecs on ", imgpath)
-                    img = rawpy.imread(imgpath).postprocess()
+            if imgpath.endswith('.gif'):
+                img = misc.imread(imgpath)
+            else:
+                img = cv2.imread(imgpath)
+            if img is None or img == []:
+                print("Could not open with OpenCV, trying raw codecs on ", imgpath)
+                img = rawpy.imread(imgpath).postprocess()
         except:
             print('Could Not load ', imgpath)
     keyps = None
-    det_t=0
+    det_t = 0
     if detetype != 'DELF':
-    # try:
+        # try:
         # print(f'YEET:IMGPATH {imgpath}')
         keyps, det_t = local_feature_detection(imgpath, img, detetype, kmax, mask, dense_descriptor, default_params)
         # print(f'KEEPS AFTER: {keyps}')
 
         if not keyps:
-            return None,None,None,None
+            return None, None, None, None
 
     # misc.featuresize_lock.acquire()
     # misc.allImagefeaturesizes.append(len(keyps))
     # misc.featuresize_lock.release()
 
-    feat, dsc_t, success, keyps2 = local_feature_description(imgpath, img, keyps, desctype, default_params,tfcores)
+    feat, dsc_t, success, keyps2 = local_feature_description(imgpath, img, keyps, desctype, default_params, tfcores)
     # if keyps is None or len(keyps) == 0:
     if keyps is None or len(keyps) == 0:
-        keyps= keyps2
-    #zeroimg = np.zeros(img.shape[:2])
-    #for kp in keyps:
-        #point = kp.pt
-        #scale = kp.size
-        #strength = kp.response
-        #zeroimg = cv2.circle(zeroimg,(int(point[0]),int(point[1])),int(scale),int(strength),-1)
+        keyps = keyps2
+    # zeroimg = np.zeros(img.shape[:2])
+    # for kp in keyps:
+    # point = kp.pt
+    # scale = kp.size
+    # strength = kp.response
+    # zeroimg = cv2.circle(zeroimg,(int(point[0]),int(point[1])),int(scale),int(strength),-1)
 
     if keyps == []: keyps = keyps2
     if feat is []:
-        return keyps,[],None,None
+        return keyps, [], None, None
 
     # print(f'KEYPS, FEATS: {keyps}, {feat}')
     return keyps, feat, det_t, dsc_t
 
     # except ValueError:
     #     return [], [], -1, -1
-def detect_and_describe(imgPaths,detetype,desctype,kmax,img,mask,dense_descriptor,default_params,basepath,newPath,tfcores=1):
+
+
+def detect_and_describe(imgPaths, detetype, desctype, kmax, img, mask, dense_descriptor, default_params, basepath,
+                        newPath, tfcores=1):
     for im in imgPaths:
         relPath = os.path.relpath(im, basepath)
-        newFullPath = os.path.join(newPath, 'features', relPath+'.npy')
+        newFullPath = os.path.join(newPath, 'features', relPath + '.npy')
         newDir = os.path.dirname(newFullPath)
         if not os.path.exists(newFullPath):
             f = local_feature_detection_and_description(im, detetype, desctype, kmax, [], mask, dense_descriptor,
-                                                        default_params,tfcores)
+                                                        default_params, tfcores)
             if f[0] is not None and f[1] is not None and len(f[0]) > 0 and len(f[1]) > 0:
 
                 if not os.path.exists(newDir):
@@ -815,8 +838,8 @@ def detect_and_describe(imgPaths,detetype,desctype,kmax,img,mask,dense_descripto
                     except:
                         print('could not make path ', newDir)
                 if os.path.exists(newDir):
-                    np.save(newFullPath,f[1])
-                    #print(im)
+                    np.save(newFullPath, f[1])
+                    # print(im)
                     prog_q.put(im)
                 else:
                     print('could not save file ', newFullPath)
@@ -825,7 +848,9 @@ def detect_and_describe(imgPaths,detetype,desctype,kmax,img,mask,dense_descripto
                 unable_q.put(im)
         else:
             prog_q.put(im)
-def progress_thread(fileList,newPath,machineNum,progjson):
+
+
+def progress_thread(fileList, newPath, machineNum, progjson):
     fileDict = {}
     completed = []
     unableList = []
@@ -835,7 +860,7 @@ def progress_thread(fileList,newPath,machineNum,progjson):
 
     pb = progressbar.ProgressBar(max_value=len(fileList))
 
-    saveFileName = os.path.join(newPath,'extraction_progress','machine_'+str(machineNum)+'_prog.json')
+    saveFileName = os.path.join(newPath, 'extraction_progress', 'machine_' + str(machineNum) + '_prog.json')
     try:
         os.makedirs(os.path.dirname(saveFileName))
     except:
@@ -846,38 +871,40 @@ def progress_thread(fileList,newPath,machineNum,progjson):
     t0 = time.time()
     count = 0
     fcount = 0
-    while count+fcount < len(fileList)-1:
+    while count + fcount < len(fileList) - 1:
         t1 = time.time()
         f = prog_q.get()
         if f in fileDict:
             del fileDict[f]
-            count +=1
+            count += 1
         completed.append(f)
         pb.update(count)
         if unable_q.qsize() > 0:
             unableList.append(unable_q.get())
-            fcount +=1
-        if t1-t0 > 120:
+            fcount += 1
+        if t1 - t0 > 120:
             remainingFiles = sorted(list(fileDict.keys()))
             d = {}
             d['uncompletedFiles'] = remainingFiles
             d['unableToCompleteFiles'] = unableList
             d['completedFiles'] = completed
             print('saving progress...')
-            with open(saveFileName,'w')as fp:
-                json.dump(d,fp)
+            with open(saveFileName, 'w')as fp:
+                json.dump(d, fp)
             print('progress saved!')
-            t0=time.time()
+            t0 = time.time()
 
-    print('progress thread quit on call', count+fcount, len(fileList))
+    print('progress thread quit on call', count + fcount, len(fileList))
 
-def recalcProgressWithoutFiles(newpath,jsonpath,featureDirectory):
+
+def recalcProgressWithoutFiles(newpath, jsonpath, featureDirectory):
     featureFile_dirs = os.listdir(featureDirectory)
     for d in featureFile_dirs:
-        bar=progressbar.ProgressBar()
-        featureFiles = os.listdir(os.path.join(featureDirectory,d))
+        bar = progressbar.ProgressBar()
+        featureFiles = os.listdir(os.path.join(featureDirectory, d))
 
-def recalcProgress(newPath,jsonpath):
+
+def recalcProgress(newPath, jsonpath):
     progfilepath = os.path.join(newPath, 'extraction_progress')
     if os.path.exists(progfilepath):
         newLeft = []
@@ -886,17 +913,19 @@ def recalcProgress(newPath,jsonpath):
         for f in os.listdir(progfilepath):
             if f.endswith('.json'):
                 print('found progress file ', f)
-                with open(os.path.join(progfilepath,f),'r') as fp:
+                with open(os.path.join(progfilepath, f), 'r') as fp:
                     j = json.load(fp)
                 newLeft += j['uncompletedFiles']
                 newCouldnt += j['unableToCompleteFiles']
-        with open (jsonpath,'r') as fp:
+        with open(jsonpath, 'r') as fp:
             fulljson = json.load(fp)
-        fulljson['uncompletedFiles']=newLeft
-        fulljson['unableToCompleteFiles']=newCouldnt
-        with open(jsonpath,'w') as fp:
-            json.dump(fulljson,fp)
+        fulljson['uncompletedFiles'] = newLeft
+        fulljson['unableToCompleteFiles'] = newCouldnt
+        with open(jsonpath, 'w') as fp:
+            json.dump(fulljson, fp)
         print('saved new json file to ', jsonpath)
+
+
 #     Set up threading queues for progress calculation
 
 if __name__ == "__main__":
@@ -925,68 +954,85 @@ if __name__ == "__main__":
     recalcProg = False
     index_key = None
     machineOffset = 0
-    features = detect_and_describe(['/home/jbrogan4/Documents/Projects/Medifor/tensorflow/models/research/delf/delf/python/examples/snowwhite.jpg'],'SURF','SURF',5000,[],None,False,True,'','./')
+    features = detect_and_describe([
+                                       '/home/jbrogan4/Documents/Projects/Medifor/tensorflow/models/research/delf/delf/python/examples/snowwhite.jpg'],
+                                   'SURF', 'SURF', 5000, [], None, False, True, '', './')
     while args:
         a = args.pop(0)
         if a == '-h':
             usage()
             sys.exit(1)
-        elif a == '-jsonFile':      jsonFile  = args.pop(0)
-        elif a == '-numCores':      numCores = int(args.pop(0))
-        elif a == '-numJobs':       numJobs = int(args.pop(0))
-        elif a == '-machineNum':    machineNum = int(args.pop(0))-1
-        elif a == '-threadBatch':   threadBatch = int(args.pop(0))
-        elif a == '-detectType':    detType = args.pop(0)
-        elif a == '-descType':      descType = args.pop(0)
-        elif a == '-kmax':          kmax = int(args.pop(0))
-        elif a == '-outputDir' :     outputDir = args.pop(0)
-        elif a == '-datasetName' :  datasetName = args.pop(0)
-        elif a == '-recalcProgress' : recalcProg = True
-        elif a == '-machineOffset' : machineOffset = int(args.pop(0))
+        elif a == '-jsonFile':
+            jsonFile = args.pop(0)
+        elif a == '-numCores':
+            numCores = int(args.pop(0))
+        elif a == '-numJobs':
+            numJobs = int(args.pop(0))
+        elif a == '-machineNum':
+            machineNum = int(args.pop(0)) - 1
+        elif a == '-threadBatch':
+            threadBatch = int(args.pop(0))
+        elif a == '-detectType':
+            detType = args.pop(0)
+        elif a == '-descType':
+            descType = args.pop(0)
+        elif a == '-kmax':
+            kmax = int(args.pop(0))
+        elif a == '-outputDir':
+            outputDir = args.pop(0)
+        elif a == '-datasetName':
+            datasetName = args.pop(0)
+        elif a == '-recalcProgress':
+            recalcProg = True
+        elif a == '-machineOffset':
+            machineOffset = int(args.pop(0))
         elif not index_key:
             index_key = a
         else:
             print("argument %s unknown" % a)
             sys.exit(1)
     machineNum -= machineOffset
-    outputDir = os.path.join(outputDir, datasetName, descType+'_'+detType)
+    outputDir = os.path.join(outputDir, datasetName, descType + '_' + detType)
     if recalcProg:
-        recalcProgress(outputDir,jsonFile)
-    with open(jsonFile,'r') as f:
+        recalcProgress(outputDir, jsonFile)
+    with open(jsonFile, 'r') as f:
         indexJson = json.load(f)
 
-    progFile = os.path.join(outputDir,'extraction_progress','machine_'+str(machineNum)+'_prog.json')
+    progFile = os.path.join(outputDir, 'extraction_progress', 'machine_' + str(machineNum) + '_prog.json')
     progJson = None
     if os.path.exists(progFile):
-        with open(progFile,'r') as fp:
+        with open(progFile, 'r') as fp:
             progJson = json.load(fp)
     if 'uncompletedFiles' in indexJson:
-        print('index json contains uncompleted files to run: ',len(indexJson['uncompletedFiles']))
+        print('index json contains uncompleted files to run: ', len(indexJson['uncompletedFiles']))
         fileList = indexJson['uncompletedFiles']
     elif progJson and 'uncompletedfiles' in progJson:
         fileList = progJson['uncompletedFiles']
-        print('Found progress file, ',len(fileList),' of ',len(indexJson['imageList']),' files left to process')
+        print('Found progress file, ', len(fileList), ' of ', len(indexJson['imageList']), ' files left to process')
     else:
         fileList = indexJson['imageList']
     fileList = sorted(fileList)
     baseDir = indexJson['baseDir']
-    machinePartitionSize = int(float(len(fileList))/float(numJobs))
-    filePart = fileList[machinePartitionSize*machineNum:min(len(fileList), machineNum*machinePartitionSize+machinePartitionSize)]
-    print('total number of files: ',len(fileList))
-    print('files to process in this job: ',len(filePart))
+    machinePartitionSize = int(float(len(fileList)) / float(numJobs))
+    filePart = fileList[machinePartitionSize * machineNum:min(len(fileList),
+                                                              machineNum * machinePartitionSize + machinePartitionSize)]
+    print('total number of files: ', len(fileList))
+    print('files to process in this job: ', len(filePart))
     batches = []
     count = 0
-    p0 = Process(target=progress_thread, args=(filePart,outputDir,machineNum,progJson), )
+    p0 = Process(target=progress_thread, args=(filePart, outputDir, machineNum, progJson), )
     p0.start()
     while count < len(filePart):
-        b = filePart[count:min(len(filePart),count+threadBatch)]
-        count+=threadBatch
+        b = filePart[count:min(len(filePart), count + threadBatch)]
+        count += threadBatch
         batches.append(b)
     print('number of batches: ', len(batches))
     if numJobs == 1:
         for b in batches:
-            detect_and_describe(b,detType,descType,kmax,[],None,False,True,baseDir,outputDir)
+            detect_and_describe(b, detType, descType, kmax, [], None, False, True, baseDir, outputDir)
     else:
-        counts = Parallel(n_jobs=numJobs)(delayed(detect_and_describe)(b,detType,descType,kmax,[],None,False,True,baseDir,outputDir) for b in batches)
+        counts = Parallel(n_jobs=numJobs)(
+            delayed(detect_and_describe)(b, detType, descType, kmax, [], None, False, True, baseDir, outputDir) for b in
+            batches)
     stillRunning.value = False
     p0.join()

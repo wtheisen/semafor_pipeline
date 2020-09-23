@@ -14,7 +14,8 @@ def process_image(input):
     checkPath = '/afs/crc.nd.edu/group/cvrl/scratch_4/MFC18_eval/'
     filepath = input.rstrip()
     foldernum = -1
-    
+
+    i = 0
     try:
         filename=os.path.basename(filepath);
         #print(filename,' ',filepath)
@@ -30,8 +31,6 @@ def process_image(input):
                 os.makedirs(os.path.dirname(testOutPath))
             except:
                 pass
-            print('processing '+filepath);
-            print('cores: ', args.TFCores)
             featureDict  = featureExtractor.processImage(worldImageResource,tfcores = args.TFCores,resourcepath=filepath)
             if not foldernum  == -1:
                 outputdir = os.path.join(args.outputdir,str(foldernum))
@@ -50,7 +49,9 @@ def process_image(input):
     except IOError as e:
         logging.info('skipping '+filepath);
     except Exception as e:
-        logging.error(traceback.format_exc())
+        print("Problem with:", filepath)
+    #except Exception as e:
+    #    logging.error(traceback.format_exc())
 
     return []
 
@@ -113,5 +114,8 @@ elif args.inputFileList is not None:
     files.extend(lines)
 with concurrent.futures.ProcessPoolExecutor(max_workers=args.PE) as executor:
     #for file in files:
+    i = 0
     for image_file, output in zip(files, executor.map(process_image, files)):
-        print (image_file)
+        if (i % 1000) == 0:
+            print(i, " out of ", len(files))
+        i = i + 1

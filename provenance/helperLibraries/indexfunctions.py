@@ -1,18 +1,26 @@
+print('started indexfunctions import')
 import os
 import sys
 import numpy as np
 # import cv2
 import faiss
+print('starting joblib')
 from joblib import Parallel,delayed
 from multiprocessing import Manager,Process
 import progressbar
 import fileutil
 
+print('starting unravel index')
+
 unravel_index = np.unravel_index
 npsum = np.sum
 prog_q = Manager().Queue(1)
 quitProg = Manager().Value('l', True)
+print('starting SCSM')
 import SCSM
+print(SCSM.__file__)
+print("ended indexfunctions import")
+
 def sanitize(x):
     """ convert array to a c-contiguous float array """
     return np.ascontiguousarray(x.astype('float32'))

@@ -1,1 +1,1 @@
-runtime in seconds: 495600.0696322918
+runtime in seconds: 88.6688883304596

@@ -1,8 +1,13 @@
+print('starting SCSM import')
+
 import sys
 import os
 import numpy as np
 # import cv2 as cv
+print('starting featureExtractor')
 import featureExtractor
+print(featureExtractor.__file__)
+print('ended feature Extractor')
 import matplotlib.pyplot as plt
 import math
 import scipy.stats as st
@@ -10,6 +15,7 @@ from scipy.sparse import lil_matrix
 from scipy import signal
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import MeanShift
+print('starting Dense Cluster Finder')
 import DenseClusterFinder
 import json
 import time
@@ -17,6 +23,8 @@ randfiles = []
 #plt = None
 fig = None#plt.figure(figsize=(1,3))
 pdf = st.norm.pdf
+print('ended SCSM import')
+
 def gkern(kernlen=21, nsig=3):
     """Returns a 2D Gaussian kernel array."""
 

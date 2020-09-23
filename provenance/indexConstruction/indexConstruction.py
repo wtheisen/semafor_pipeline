@@ -53,8 +53,8 @@ class indexConstruction:
     machine_num = 0
 
     preproc_str = "OPQ8_32" #OPQ, # of subspaces to decompose into _ number of final dimensions
-    ivf_str = "IVF65536"
-    # ivf_str = "IVF512"
+    #ivf_str = "IVF65536"
+    ivf_str = "IVF512"
     # ivf_str = "IVF256"
     pqflat_str = "PQ8"
 
@@ -130,13 +130,15 @@ class indexConstruction:
         import numpy as np
         print('looking for feature cache for training in ',self.trainfeat_cachefile)
         print('looking for preproc in ', self.preproc_cachefile)
+        '''
         if os.path.exists(self.preproc_cachefile) and os.path.exists(self.cent_cachefile):
             print('preproc index already exists, not loading training features...')
             allfeats =  []#np.load(self.trainfeat_cachefile)
         elif os.path.exists(self.trainfeat_cachefile):
             print('found cached training features, loading..')
             allfeats = np.load(self.trainfeat_cachefile)
-        else:
+        '''
+        if True:
             # if os.path.exists(cache_dir):
             #     print("Loading premade training file...")
             #     return np.load(cache_dir)
@@ -170,7 +172,6 @@ class indexConstruction:
                     features,otherProps = self.deserializeFeatures(featureResource)
                     # features = np.load(file)
                     f = features[:,:self.featuredimensions]
-
                     if f.shape[1] == self.featuredimensions:
                         allfeats.append(f)
                     #print(features.shape)
@@ -388,7 +389,7 @@ class indexConstruction:
 
             with open(featurelistfile) as fp:
                 fileCount = 0
-                featurelist = fp.readlines() 
+                featurelist = fp.readlines()
             print('Total feature files to index: ', len(featurelist))
             shardLength = int(math.ceil(len(featurelist)/self.numshards))
             shardStart = self.shardnum*shardLength
@@ -421,6 +422,7 @@ class indexConstruction:
                 fp.write('featureCount,batchTime,totalTime,memoryUsage\n')
             tcount0 = time.time()
             tcountTotal = 0
+            print("length of feature list:", len(featurelist))
             for filepath in tqdm(featurelist):
                 gpuWasFlushed = False
                 features = None
@@ -492,9 +494,11 @@ class indexConstruction:
                 #self.moveGPUtoCPU(len(featurelistfile) * self.feats_per_file)
 
             if self.max_add > 0:
+
                 # it does not contain all the vectors
                 gpu_index = None
 
+        print("starting finalize index")
         outi = self.finalizeIndex2()
         if os.path.isfile(self.offset_cahcefile):
             fp = open(self.offset_cahcefile,'a')
@@ -521,7 +525,6 @@ class indexConstruction:
         img_ids = np.zeros((features.shape[0],1), dtype='int64') + self.imCount
         feature_ids = np.asarray(range(self.featCount,self.featCount + features.shape[0]))
         meta = np.hstack((meta,img_ids))
-        print('meta: ',meta.shape)
         if len(meta.shape) == 1:
             meta = meta.reshape((1,-1))
 

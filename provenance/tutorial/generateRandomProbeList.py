@@ -18,6 +18,8 @@ for l in lines:
     lines2.append(l.rstrip())
 
 lines2 = np.array(lines2)
+print(len(lines2))
+print(args.NumSamples)
 ilist = np.random.choice(len(lines2),replace=False,size=int(args.NumSamples))
 probelist = list(lines2[ilist])
 
