@@ -1,0 +1,10 @@
+#!/bin/bash
+#$ -q gpu
+#$ -l gpu=1
+#$ -M wtheisen@nd.edu
+#$ -m abe
+
+module load conda
+conda activate plsInstallReccs10
+rm ./semafor_job_output.out
+./RunAll.sh "semafor_job_output.out" >> semafor_job_output.out
