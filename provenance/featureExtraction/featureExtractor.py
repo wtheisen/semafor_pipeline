@@ -501,8 +501,9 @@ def local_feature_detection(imgpath, img, detetype, kmax=500, mask=None, dense_d
         # print(f'KEYPOINTS BEFORE RETURN: {keypoints}')
         return keypoints, det_t
 
-    except:
-        print("Failure in detecting the keypoints")
+    except Exception as e:
+        print("Failure in detecting the keypoints:")
+        print(e)
         sys.stdout.flush()
         e_type, e_val, e_tb = sys.exc_info()
         traceback.print_exception(e_type, e_val, e_tb)
