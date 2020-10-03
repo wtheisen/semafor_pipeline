@@ -4,7 +4,17 @@
 #$ -M wtheisen@nd.edu
 #$ -m abe
 
+#Load conda module
 module load conda
-conda activate plsInstallReccs10
+conda activate image_clustering_env
+
+#Reset output directory (important if cache failures exist)
+#rm -r ~/reddit_semafor_output/
+#mkdir ~/reddit_semafor_output
+
+#Remove output dumps from previous jobs
 rm ./semafor_job_output.out
-./RunAll.sh "semafor_job_output.out" >> semafor_job_output.out
+rm ./*.job.*
+
+#Run script dumping STDOUT/STDERR to the output file
+./RunAll.sh "semafor_job_output.out" &>> semafor_job_output.out

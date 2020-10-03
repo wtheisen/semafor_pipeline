@@ -1,40 +1,20 @@
 #!/bin/bash
 
-# codeSourcePath=/home/jbrogan4/Documents/Projects/Medifor/GPU_Prov_Filtering_fix/GPU_Prov_Filtering/provenance/tutorial
-# cd $codeSourcePath
-
 export PYTHONPATH=../notredame/:../featureExtraction/:../indexConstruction/:../provenanceFiltering:../provenanceGraphConstruction:../helperLibraries/:$PYTHONPATH
-#export PYTHONPATH=../../cv2:$PYTHONPATH
 
 index_sample=5000
-#index_sample=2
 retrieval_recall=1000
-# motif_clusters = 500
+motif_clusters=150
 
 datasetName=reddit_clusters
-#imageRoot1=/home/pthomas4/semafor/semafor/media/pthomas4/scratch2/Reddit_Prov_Dataset_v6/Data/photos_subset
 
 imageRoot1=/afs/crc.nd.edu/user/w/wtheisen/reddit_dataset
-# imageRoot1=/media/jbrogan4/bill/Pictures/InstagramImages
-# imageRoot2=/media/jbrogan4/bill/Pictures/TwitterImages
-# featureFolder=/home/wtheisen/indoClusteringResults/features_$datasetName
-# indexSavePath=/home/wtheisen/indoClusteringResults
 
-# featureFolder=/home/pthomas4/semafor/media/pthomas4/scratch2/indo_vgg/features_$datasetName
-# indexSavePath=/home/pthomas4/semafor/media/pthomas4/scratch2/indo_vgg
-#featureFolder=/home/pthomas4/semafor/semafor/media/pthomas4/scratch2/reddit_vgg/features_$datasetName
-#indexSavePath=/home/pthomas4/semafor/semafor/media/pthomas4/scratch2/reddit_vgg
 featureFolder=/afs/crc.nd.edu/user/w/wtheisen/reddit_semafor_output/features_$datasetName
 indexSavePath=/afs/crc.nd.edu/user/w/wtheisen/reddit_semafor_output
 
-# featureFolder=/home/pthomas4/semafor/media/pthomas4/scratch2/Indonesia_Retry/features_$datasetName
-# indexSavePath=/home/pthomas4/semafor/media/pthomas4/scratch2/Indonesia_Retry
-
-
 #Build list of images
-# python3 generateServerDictionary.py $imageRoot1,$imageRoot2 "${indexSavePath}/${datasetName}" # this script takes as arguments <path to root of images> <name to save the list of images to>, and outputs 2 files: $datasetName_filelist.txt and $datasetName_pathmap.json
-
-python3 generateServerDictionary.py $imageRoot1 "${indexSavePath}/${datasetName}" &>> $1 # this script takes as arguments <path to root of images> <name to save the list of images# RETVAL=$?
+python3 generateServerDictionary.py $imageRoot1 "${indexSavePath}/${datasetName}" &>> $1
 RETVAL=$?
 if [ $RETVAL -ne 0 ]; then
     echo "Failure on generateServerDictionary"
@@ -89,7 +69,7 @@ if [ $RETVAL -ne 0 ]; then
 fi
 
 #Motif Clustering
-python3 ../provenanceFiltering/GraphClustering_new.py --FilteringResultFolder "${indexSavePath}/results_${datasetName}/json" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --ImageRoot $imageRoot1 --ImageFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --OutputFolder "${indexSavePath}/results_${datasetName}/motifClusters" --k 150 &>> $1
+python3 ../provenanceFiltering/GraphClustering_new.py --FilteringResultFolder "${indexSavePath}/results_${datasetName}/json" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --ImageRoot $imageRoot1 --ImageFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --OutputFolder "${indexSavePath}/results_${datasetName}/motifClusters" --k $motif_clusters &>> $1
 RETVAL=$?
 if [ $RETVAL -ne 0 ]; then
     echo "Failure on GraphClustering_new.py"

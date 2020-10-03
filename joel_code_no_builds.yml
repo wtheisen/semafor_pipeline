@@ -1,4 +1,4 @@
-name: plsInstallReccs10
+name: image_clustering_env
 channels:
   - pytorch
   - anaconda
