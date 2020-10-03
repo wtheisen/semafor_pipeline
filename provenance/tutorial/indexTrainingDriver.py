@@ -15,7 +15,7 @@ parser.add_argument('--IndexOutputFile', help='output file for the Index Trainin
 
 args = parser.parse_args()
 
-indexConstructor = indexConstruction(cachefolder=os.path.dirname(args.IndexOutputFile),featdims=20)
+indexConstructor = indexConstruction(cachefolder=os.path.dirname(args.IndexOutputFile),featdims=64)
 indexTrainingParameters = indexConstructor.trainIndex(args.FeatureFileList)
 outpath = os.path.join(args.IndexOutputFile)
 try:

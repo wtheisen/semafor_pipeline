@@ -47,7 +47,8 @@ class queryIndex:
     # resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_vgg','fdump')
     #resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_phash','fdump')
     #resultSaveFolder = os.path.join('/scratch365/jbrogan4/eval19/','fdump')
-    resultSaveFolder = os.path.join('/home/pthomas4/semafor/media/pthomas4/scratch2/indo_vgg', 'fdump')
+    #resultSaveFolder = os.path.join('/home/pthomas4/semafor/media/pthomas4/scratch2/indo_vgg', 'fdump')
+    resultSaveFolder = os.path.join('/afs/crc.nd.edu/user/w/wtheisen/reddit_semafor_output', 'fdump')
     msaveFolder = os.path.join(resultSaveFolder,'matrices')
     fsaveFolder = os.path.join(resultSaveFolder,'features')
     index=None

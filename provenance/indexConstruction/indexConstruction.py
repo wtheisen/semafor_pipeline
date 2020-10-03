@@ -40,13 +40,15 @@ class indexConstruction:
 
     ngpu = faiss.get_num_gpus()
     # ngpu = 1
-    add_batch_size = 32768
+    #add_batch_size = 32768
+    add_batch_size = 4096
     use_precomputed_tables = False
     tempmem = -1#1536*1024*1024  # if -1, use system default
     max_add = -1
     use_float16 = True
     use_cache = True
-    train_size = 300000000
+    #train_size = 300000000
+    train_size = 1000
     totalFeatureNum = -1
     kp_per_file = 10000
     cacheroot = None
@@ -54,8 +56,8 @@ class indexConstruction:
 
     preproc_str = "OPQ8_32" #OPQ, # of subspaces to decompose into _ number of final dimensions
     #ivf_str = "IVF65536"
-    ivf_str = "IVF512"
-    # ivf_str = "IVF256"
+    #ivf_str = "IVF512"
+    ivf_str = "IVF256"
     pqflat_str = "PQ8"
 
     index = None
@@ -63,7 +65,8 @@ class indexConstruction:
     preproc = None
     IDtoNameMap = {}
     IDtoImageSizeMap = {}
-    gpuRAM = 8  # in GB
+    #gpuRAM = 8  # in GB
+    gpuRAM = 4  # in GB
     feats_per_file = kp_per_file
     totalImagesToIndex = -1
     cpuShardCount = 0
@@ -237,7 +240,7 @@ class indexConstruction:
             print("load centroids found in ", self.cent_cachefile)
             centroids = np.load(self.cent_cachefile)
         else:
-            nt = max(1000000, 256 * self.ncent)
+            nt = max(10000, 256 * self.ncent)
             print("train coarse quantizer...")
             t0 = time.time()
             centroids = self.train_coarse_quantizer(xt[:nt], self.ncent, preproc)
