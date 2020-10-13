@@ -69,7 +69,7 @@ dependencies:
   - entrypoints=0.3
   - et_xmlfile=1.0.1
   - expat=2.2.6
-  - faiss-gpu=1.5.3
+  - faiss-gpu=1.6.3
   - fastcache=1.1.0
   - fastrlock=0.4
   - filelock=3.0.12
@@ -345,3 +345,4 @@ dependencies:
     - tensorflow-gpu==2.0.0
     - termcolor==1.1.0
     - scikit-fuzzy
+    - gputil

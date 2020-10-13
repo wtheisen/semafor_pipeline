@@ -22,6 +22,8 @@ import math
 import dbm
 from diskarray import DiskArray
 from tqdm import tqdm
+import GPUtil
+
 def getMemUsage():
     process = psutil.Process(os.getpid())
     return process.memory_info().rss
@@ -67,6 +69,11 @@ class indexConstruction:
     IDtoImageSizeMap = {}
     #gpuRAM = 8  # in GB
     gpuRAM = 4  # in GB
+
+    # experimental new way to adataptably set the GPU ram to 2/3 of the max of the card
+    # g = GPUtil.getGPUs()[0] # How do we know which GPU to get if there are multiple?
+    # gpuRAM = int(int(str(int(gpu.memoryTotal)).zfill(5)[:2].lstrip('0')) * float(2)/3)
+
     feats_per_file = kp_per_file
     totalImagesToIndex = -1
     cpuShardCount = 0
