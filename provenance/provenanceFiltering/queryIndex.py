@@ -90,8 +90,8 @@ class queryIndex:
             if savefolder is None:
                 print('PLEASE SET THE SAVE FOLDER')
             self.resultSaveFolder = savefolder
-            self.msaveFolder = os.path.join(resultSaveFolder,'matrices')
-            self.fsaveFolder = os.path.join(resultSaveFolder,'features')
+            self.msaveFolder = os.path.join(self.resultSaveFolder,'matrices')
+            self.fsaveFolder = os.path.join(self.resultSaveFolder,'features')
             print("gpus found: ", len(self.gpu_resources))
             fileutil.make_sure_path_exists(self.msaveFolder)
             fileutil.make_sure_path_exists(self.fsaveFolder)
