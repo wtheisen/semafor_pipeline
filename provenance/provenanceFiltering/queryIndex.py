@@ -49,8 +49,6 @@ class queryIndex:
     #resultSaveFolder = os.path.join('/scratch365/jbrogan4/eval19/','fdump')
     #resultSaveFolder = os.path.join('/home/pthomas4/semafor/media/pthomas4/scratch2/indo_vgg', 'fdump')
     resultSaveFolder = os.path.join('/afs/crc.nd.edu/user/w/wtheisen/reddit_semafor_output', 'fdump')
-    msaveFolder = os.path.join(resultSaveFolder,'matrices')
-    fsaveFolder = os.path.join(resultSaveFolder,'features')
     index=None
     id = None
     preproc = None
@@ -92,6 +90,8 @@ class queryIndex:
             if savefolder is None:
                 print('PLEASE SET THE SAVE FOLDER')
             self.resultSaveFolder = savefolder
+            msaveFolder = os.path.join(resultSaveFolder,'matrices')
+            fsaveFolder = os.path.join(resultSaveFolder,'features')
             print("gpus found: ", len(self.gpu_resources))
             fileutil.make_sure_path_exists(self.msaveFolder)
             fileutil.make_sure_path_exists(self.fsaveFolder)
