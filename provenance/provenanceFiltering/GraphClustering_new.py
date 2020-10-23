@@ -135,6 +135,7 @@ parser.add_argument('--ImageRoot', help='Root Image Directory')
 parser.add_argument('--CacheFolder', help='where to save all intermediate files',default='.')
 parser.add_argument('--ImageFileList', help='list of image files')
 parser.add_argument('--OutputFolder', help='output folder')
+parser.add_argument('--ClusterPrefix', help='Prefix for cluster name', default='cluster_')
 parser.add_argument('--k', help='number of clusters')
 
 args = parser.parse_args()
@@ -144,6 +145,7 @@ dataFolder = args.ImageRoot
 cacheFolder = args.CacheFolder
 allImageFilesPath = args.ImageFileList
 saveFolder = args.OutputFolder
+clusterPrefix = args.ClusterPrefix
 
 numClusters = int(args.k)
 print(f'Clustering with k = {numClusters}...')
@@ -230,9 +232,13 @@ for clusterID in u:
     for i in bar(range(0, len(ims_for_cluster))):
         impath = ims_for_cluster[i]
         imname = os.path.basename(impath)
-        score = 1
+
+        row = imageIDtoIndex[clusterID]
+        col = imageIDtoIndex[(i)]
+        score = totalMat[row, col]
+
         r1.addScore(imname, score, ID=0)
-    savename = '4chan_cluster' + str(clusterID).zfill(3) + '_size' + str(len(ims_for_cluster)) + '.json'
+    savename = clusterPrefix + str(clusterID).zfill(3) + '_size' + str(len(ims_for_cluster)) + '.json'
     #print(r1)
     jout = createOutput(savename, r1)
     jout = convertNISTJSON(jout)
