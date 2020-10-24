@@ -228,14 +228,14 @@ for clusterID in u:
     #ims_for_cluster = [allImagePaths[x] for x in clusters.labels_ if x == clusterID ]
     # print(ims_for_cluster)
     r1 = filteringResults()
-    row = imageIDtoIndex[clusterID]
+    row = imageIDtoIndex[ims_for_cluster[0]]
     bar = progressbar.ProgressBar()
 
     for i in bar(range(0, len(ims_for_cluster))):
         impath = ims_for_cluster[i]
         imname = os.path.basename(impath)
 
-        col = imageIDtoIndex[(i)]
+        col = imageIDtoIndex[(imname)]
         score = totalMat[row, col]
 
         r1.addScore(imname, score, ID=0)
