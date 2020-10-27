@@ -6,3 +6,4 @@ Current research pipeline for image provenance and clustering
 - [ ] Report match scores in cluster json output
 - [ ] Add visualization script to RunALl.sh
 - [ ] "Robustify" the caching process and allow for cleaner re-runs
+- [ ] Test moving from SURF to SURF_GPU for perfomance improvements
