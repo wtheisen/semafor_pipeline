@@ -117,7 +117,7 @@ def convertNISTJSON(results):
         node['id'] = str(count)
         node['file'] = 'world/' + filename
         node['fileid'] = os.path.splitext(os.path.basename(filename))[0]
-        node['nodeConfidenceScore'] = scores[filename]
+        node['nodeConfidenceScore'] = str(scores[filename])
         # if meta is not None:
         #    node['meta'] = meta[filename]
         nodes.append(node)
@@ -228,14 +228,17 @@ for clusterID in u:
     #ims_for_cluster = [allImagePaths[x] for x in clusters.labels_ if x == clusterID ]
     # print(ims_for_cluster)
     r1 = filteringResults()
-    row = imageIDtoIndex[ims_for_cluster[0]]
+    #print(imageIDtoIndex)
+
+    #resultID = os.path.splitext(os.path.basename(r))[0]
+    row = imageIDtoIndex[os.path.splitext(os.path.basename(ims_for_cluster[0]))[0]]
     bar = progressbar.ProgressBar()
 
     for i in bar(range(0, len(ims_for_cluster))):
         impath = ims_for_cluster[i]
         imname = os.path.basename(impath)
 
-        col = imageIDtoIndex[(imname)]
+        col = imageIDtoIndex[(os.path.splitext(imname)[0])]
         score = totalMat[row, col]
 
         r1.addScore(imname, score, ID=0)
