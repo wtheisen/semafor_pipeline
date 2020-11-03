@@ -75,3 +75,11 @@ if [ $RETVAL -ne 0 ]; then
     echo "Failure on GraphClustering_new.py"
     exit 1
 fi
+
+#Cluster Visualization
+python3 ../helperLibraries/visualizeFilterResultsNew.py --clusters "${indexSavePath}/results_${datasetName}/motifClusters" --folder --datasetName ${datasetName} --filedict "{$indexSavePath}/{$datasetName}_pathmap.json" --outputDir "${indexSavePath}/results_${datasetName}/clustervis" --recall $retrieval_recall
+RETVAL=$?
+if [ $RETVAL -ne 0 ]; then
+    echo "Failure on visualizeFilterResultsNew.py"
+    exit 1
+fi
