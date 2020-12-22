@@ -345,4 +345,4 @@ dependencies:
     - tensorflow-gpu==2.0.0
     - termcolor==1.1.0
     - scikit-fuzzy
-    - gputil
+    - gputil # this is the second instance of this in the yml - see line 321
