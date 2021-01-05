@@ -41,14 +41,14 @@ def loadIndexFromFile(cur,filename,id=None,tmpdir = None,no_index_load=False):
 
 class queryIndex:
     runTestMode = True
-    # resultSaveFolder = os.path.join('/media/jbrogan4/scratch2/Indonesia/','fdump')
-    # resultSaveFolder = os.path.join('/media/wtheisen/scratch2/4chan_phash/','fdump')
+    #resultSaveFolder = os.path.join('/media/jbrogan4/scratch2/Indonesia/','fdump')
+    #resultSaveFolder = os.path.join('/media/wtheisen/scratch2/4chan_phash/','fdump')
     #resultSaveFolder = os.path.join('/media/wtheisen/scratch2/Indonesia_Retry','fdump')
-    # resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_vgg','fdump')
+    #resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_vgg','fdump')
     #resultSaveFolder = os.path.join('/media/wtheisen/scratch2/indo_phash','fdump')
     #resultSaveFolder = os.path.join('/scratch365/jbrogan4/eval19/','fdump')
     #resultSaveFolder = os.path.join('/home/pthomas4/semafor/media/pthomas4/scratch2/indo_vgg', 'fdump')
-    resultSaveFolder = os.path.join('/afs/crc.nd.edu/user/w/wtheisen/reddit_semafor_output', 'fdump')
+    #resultSaveFolder = os.path.join('/afs/crc.nd.edu/user/w/wtheisen/reddit_semafor_output', 'fdump')
     index=None
     id = None
     preproc = None
@@ -57,7 +57,7 @@ class queryIndex:
     tempmem = 1536 * 1024 * 1024  # if -1, use system default
     IDToImage = {}
     isDeserialized = False
-    useNEHST = False
+    useNEHST = True
     algorithmName = "ND_dsurf_5000_filtering"
     currentQueryFeatureResource = None
     keypointMetadata = []
@@ -398,8 +398,8 @@ class queryIndex:
     #queryFeature contains resource object containing feature(s)
     #this allows for non-image queries
     def queryFeatures (self, featureResource, numberOfResultsToRetrieve,resourceName = None):
-        useNehst = False
-        #useNehst = True
+        #useNehst = False
+        useNehst = True
         if resourceName is None and not self.rerunResults:
             resourceName = featureResource.key
         unqpath = os.path.join(self.msaveFolder,resourceName)
@@ -543,7 +543,7 @@ class queryIndex:
         return np.reshape(data[:-4], (int(data[-4]), int(data[-3]))),(data[-2],data[-1])
 
     def concatFeatures(self,r1,r2):
-        featureExtractor = featureExtraction(descriptiontype='DELF',detectiontype='DELF')
+        featureExtractor = featureExtraction(descriptiontype='SURF3',detectiontype='SURF3')
         f1 = self.deserializeFeatures(r1['supplemental_information']['value'])
         f2 = self.deserializeFeatures(r2['supplemental_information']['value'])
         cat = np.vstack((f1[0],f2[0]))

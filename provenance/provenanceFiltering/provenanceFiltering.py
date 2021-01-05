@@ -64,7 +64,7 @@ class provenanceFiltering:
           allResults = self.scalableQuery.queryImages(allQueries,numberOfResultsToRetrieve,rootpath=rootpath)
           print('yote')
           #Tier2
-          #maxScore = allResults[0].scores[list(allResults[0].scores.keys())[0]]
+          maxScore = allResults[0].scores[list(allResults[0].scores.keys())[0]]
 
           print('gonna hit dat dere if statement')
           if self.MultiTier and maxScore > .03: #only do multitier search if the first query gets enough votes (3% of all features match)

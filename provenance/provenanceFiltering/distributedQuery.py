@@ -78,48 +78,48 @@ class distributedQuery:
         #print(allresults)
         return allresults
 
-def getWorldImage(self,fileKey):
-    filePath = os.path.join(self.imageDirectory,fileKey)
-    worldImageResource= Resource.from_file(fileKey, filePath)
-    return worldImageResource
+    def getWorldImage(self,fileKey):
+        filePath = os.path.join(self.imageDirectory,fileKey)
+        worldImageResource= Resource.from_file(fileKey, filePath)
+        return worldImageResource
 
-# currently very ineffcient due to disk read. Wll parallelize
-# queryImages is an array of image resourceseeryFeatures is an array of Images
-def queryFeatures (self, queryFeatures, numberOfResultsToRetrieve,ignoreIDs = []):
-    allresults = []
-    # for i in queryImages:
-    #    allresults.append(filteringResults())
-    # TODO:Feature concatination for faster query batches
-    # concatinate features
-    # allFeats = []
-    # featureExtractor = featureExtraction()
-    # for feature in queryFeatures:
-    #     allFeats.append(self.deserializeFeatures(feature))
-    # allFeats = np.concatenate(allFeats,axis=0)
-    # allFeatsResource = featureExtractor.createOutput(Resource("", featureExtractor.serializeFeature(allFeats), 'application/octet-stream'))
-    # allFeatsResource = ['supplemental_information']['value']
-    for i in queryFeatures:
-        allresults.append(filteringResults())
-    for index in self.indexFiles:
-        indexfile = open(index,'rb')
-        indexResource = Resource('index', indexfile.read(),'application/octet-stream')
-        # curQuery = queryIndex(indexResource)
-        if not self.isTest and self.curQuery is None:
-            #print('initializing a new query index....')
-            self.curQuery = queryIndex(indexResource)
-        c=0
-        for feature in queryFeatures:
-            result = self.curQuery.queryFeatures(feature,numberOfResultsToRetrieve)
-            allresults[c].mergeScores(result,ignoreIDs=ignoreIDs)
-            c=c+1
-    return allresults
+    # currently very ineffcient due to disk read. Wll parallelize
+    # queryImages is an array of image resourceseeryFeatures is an array of Images
+    def queryFeatures (self, queryFeatures, numberOfResultsToRetrieve,ignoreIDs = []):
+        allresults = []
+        # for i in queryImages:
+        #    allresults.append(filteringResults())
+        # TODO:Feature concatination for faster query batches
+        # concatinate features
+        # allFeats = []
+        # featureExtractor = featureExtraction()
+        # for feature in queryFeatures:
+        #     allFeats.append(self.deserializeFeatures(feature))
+        # allFeats = np.concatenate(allFeats,axis=0)
+        # allFeatsResource = featureExtractor.createOutput(Resource("", featureExtractor.serializeFeature(allFeats), 'application/octet-stream'))
+        # allFeatsResource = ['supplemental_information']['value']
+        for i in queryFeatures:
+            allresults.append(filteringResults())
+        for index in self.indexFiles:
+            indexfile = open(index,'rb')
+            indexResource = Resource('index', indexfile.read(),'application/octet-stream')
+            # curQuery = queryIndex(indexResource)
+            if not self.isTest and self.curQuery is None:
+                #print('initializing a new query index....')
+                self.curQuery = queryIndex(indexResource)
+            c=0
+            for feature in queryFeatures:
+                result = self.curQuery.queryFeatures(feature,numberOfResultsToRetrieve)
+                allresults[c].mergeScores(result,ignoreIDs=ignoreIDs)
+                c=c+1
+        return allresults
 
-def concatFeatures(self,r1,r2):
-    featureExtractor = featureExtraction()
-    cat = np.vstack((self.deserializeFeatures(r1['supplemental_information']['value']),self.deserializeFeatures(r2['supplemental_information']['value'])))
-    filename = r1['supplemental_information']['value'].key
-    featureResource = Resource(filename, featureExtractor.serializeFeature(cat), 'application/octet-stream')
-    return featureExtractor.createOutput(featureResource)
+    def concatFeatures(self,r1,r2):
+        featureExtractor = featureExtraction()
+        cat = np.vstack((self.deserializeFeatures(r1['supplemental_information']['value']),self.deserializeFeatures(r2['supplemental_information']['value'])))
+        filename = r1['supplemental_information']['value'].key
+        featureResource = Resource(filename, featureExtractor.serializeFeature(cat), 'application/octet-stream')
+        return featureExtractor.createOutput(featureResource)
 
 if __name__ == "__main__":
     indexfolder = sys.argv[1]
