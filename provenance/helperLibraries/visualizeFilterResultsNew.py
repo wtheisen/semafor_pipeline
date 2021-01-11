@@ -3,8 +3,9 @@ import sys
 import os
 import argparse
 import urllib.request
+import glob
 filedict_rel = {}
-def buildFilterPage(jsonFile,DatasetName,ServerPort,k,ServerAddress='http://medifor2.ecn.purdue.edu',numColumns = 5):
+def buildFilterPage(jsonFile,DatasetName,ServerPort,k,folder_path,ServerAddress='http://medifor2.ecn.purdue.edu',numColumns = 5):
     head = "<head>\n\
     <style>\n\
     .container {\n\
@@ -39,7 +40,6 @@ def buildFilterPage(jsonFile,DatasetName,ServerPort,k,ServerAddress='http://medi
     with open(jsonFile,'r') as fp:
         results = json.load(fp)
     nodes=results['nodes']
-
     imageList = ""
 
     ncount = 1
@@ -53,8 +53,8 @@ def buildFilterPage(jsonFile,DatasetName,ServerPort,k,ServerAddress='http://medi
         rootNode = os.path.join('world',rootid)
     imageList += "<div id=\"parent\">\n"
     imageList += "<div class=\"root\">\n\
-                        <img src=\"" + str(ServerAddress)+":"+str(ServerPort)+"/"+os.path.join(DatasetName,rootNode) + "\" />\n\
                       </div>"
+    #<img src=\"" + str(ServerAddress)+":"+str(ServerPort)+"/"+os.path.join(DatasetName,rootNode) + "\" />\n\
     for node in nodes[:k]:
         if ncount % numColumns == 0 and ncount > 0:
             imageList += '</div>\n'
@@ -70,7 +70,7 @@ def buildFilterPage(jsonFile,DatasetName,ServerPort,k,ServerAddress='http://medi
             #print('fpath: ',fpath)
         if not fpath: fpath = fname
         imageList += "<div class=\"container\">\n\
-                <img src=\"http://{}:{}/".format(ServerAddress, ServerPort) + os.path.join(fpath) + "\" />\n\
+                <img src=\"." + folder_path + os.path.join(fpath) + "\" />\n\
                       </div>"
     imageList += "</body>"
     return head+imageList
@@ -80,9 +80,9 @@ if __name__ == "__main__":
     parser.add_argument("--clusters")
     parser.add_argument("--datasetName")
     parser.add_argument("--recall", type=int)
-    parser.add_argument("--address",type=str,default='0.0.0.0')
+    parser.add_argument("--address",type=str,default='wl-gpu1.cse.nd.edu')
     parser.add_argument("--port", type=int,default=8001)
-    parser.add_argument('--folder', action='store_true')
+    parser.add_argument('--folder', type=str, default=None)
     parser.add_argument('--outputDir')
     parser.add_argument('--filedict',default=None)
     args = parser.parse_args()
@@ -95,10 +95,12 @@ if __name__ == "__main__":
         for f in filedicttmp:
             fullpath = filedicttmp[f]
             parts = fullpath.split('/')
-            i = 0
-            if dname in parts:
-                i = min(parts.index(dname)+1,len(parts)-1)
-            relpath = urllib.request.pathname2url('/'.join(parts[i:]))
+            relpath = parts[-1]
+            #i = 0
+            #if dname in parts:
+            #    i = min(parts.index(dname)+1,len(parts)-1)
+            #relpath = urllib.request.pathname2url('/'.join(parts[i:]))
+            #print(relpath)
             #relpath = '/'.join(parts[i:]).replace('(','%28').replace(')','%29')
             filedict_rel[f]= relpath
             filedict_rel[os.path.splitext(f)[0]] = relpath
@@ -107,13 +109,16 @@ if __name__ == "__main__":
             #print(filedict_rel.keys())
     if not os.path.exists(args.outputDir):
         os.makedirs(args.outputDir)
-    if args.folder is True:
-        for jfile in os.listdir(args.jsonFile):
+    files = glob.glob(args.outputDir + "/*html")
+    for f in files:
+        os.remove(f)
+    if args.folder is not None:
+        for jfile in os.listdir(args.clusters):
             if jfile.endswith('.json'):
-                htmlTXT = buildFilterPage(os.path.join(args.jsonFile,jfile),args.datasetName,args.port,args.recall,args.address)
+                htmlTXT = buildFilterPage(os.path.join(args.clusters,jfile),args.datasetName,args.port,args.recall,args.folder,args.address)
                 with open(os.path.join(args.outputDir,jfile+'.html'),'w') as f:
                     f.write(htmlTXT)
     else:
-        htmlTXT = buildFilterPage(args.jsonFile,args.datasetName,args.port,args.recall,args.address)
-        with open(os.path.join(args.outputDir, os.path.basename(args.jsonFile) + '.html'), 'w') as f:
+        htmlTXT = buildFilterPage(args.clusters,args.datasetName,args.port,args.folder,args.recall,args.address)
+        with open(os.path.join(args.outputDir, os.path.basename(args.clusters) + '.html'), 'w') as f:
             f.write(htmlTXT)

@@ -11,6 +11,12 @@ import collections
 import argparse
 from fileutil import make_sure_path_exists
 import skfuzzy
+import networkx as nx
+import community as community_louvain
+import matplotlib.cm as cm
+import matplotlib.pyplot as plt
+import glob
+import markov_clustering as mcl
 
 class filteringResults:
     map = {}
@@ -92,11 +98,11 @@ class filteringResults:
             self.scores[s] = self.scores[s] / maxVal
 
 
-def createOutput(probeFilename, resultScores):
-    return {'algorithm': createAlgOutput(), 'provenance_filtering': createFilteringOutput(probeFilename, resultScores)}
+def createOutput(probeFilename, resultScores, algorithmName, algorithmVersion):
+    return {'algorithm': createAlgOutput(algorithmName, algorithmVersion), 'provenance_filtering': createFilteringOutput(probeFilename, resultScores)}
 
 
-def createAlgOutput():
+def createAlgOutput(algorithmName, algorithmVersion):
     return {'name': algorithmName.replace(" ", ""), 'version': algorithmVersion.replace(" ", "")}
 
 
@@ -117,7 +123,7 @@ def convertNISTJSON(results):
         node['id'] = str(count)
         node['file'] = 'world/' + filename
         node['fileid'] = os.path.splitext(os.path.basename(filename))[0]
-        node['nodeConfidenceScore'] = str(scores[filename])
+        node['nodeConfidenceScore'] = scores[filename]
         # if meta is not None:
         #    node['meta'] = meta[filename]
         nodes.append(node)
@@ -128,6 +134,76 @@ def convertNISTJSON(results):
     #print(jsonstring)
     return jsonstring
 
+def do_markov_clustering(totalMat, saveFolder):
+    nxmat = nx.from_scipy_sparse_matrix(totalMat)
+    adj_matrix = nx.to_numpy_matrix(nxmat)
+    res = mcl.run_mcl(adj_matrix)
+    clusterID_list = mcl.get_clusters(res)
+
+    j = 0
+    algorithmVersion = '1'
+    algorithmName = "Markov"
+    for clusterID in clusterID_list:
+        clusterID = list(clusterID)
+        print('Generating results for cluster ', j)
+        # print(clusters.labels_)
+        ims_for_cluster = np.array(allImagePaths)[clusterID]
+        # ims_for_cluster = [allImagePaths[x] for x in clusters.labels_ if x == clusterID ]
+        # print(ims_for_cluster)
+        r1 = filteringResults()
+        bar = progressbar.ProgressBar()
+        for i in bar(range(0, len(ims_for_cluster))):
+            impath = ims_for_cluster[i]
+            imname = os.path.basename(impath)
+            score = 1
+            r1.addScore(imname, score, ID=0)
+        savename = 'cluster' + str(j).zfill(3) + '_size' + str(len(ims_for_cluster)) + '_algorithm_' + algorithmName + '.json'
+        # print(r1)
+        jout = createOutput(savename, r1, algorithmName, algorithmVersion)
+        jout = convertNISTJSON(jout)
+        j = j + 1
+
+        with open(os.path.join(saveFolder, savename), 'w') as fp:
+            fp.write(jout)
+
+def do_spectral_clustering(totalMat, cacheFolder, saveFolder):
+    sparseMat = totalMat.tocsr()
+    print('Shape: ', sparseMat.shape)
+    print('clustering...')
+    amOutPath = os.path.join(cacheFolder, 'affinityMatrix')
+    save_npz(amOutPath, sparseMat)
+
+    labels = spectral_clustering(sparseMat, n_clusters=numClusters, eigen_solver='arpack', random_state=15)
+
+    # labels = spectral_clustering(sparseMat,n_clusters=100,eigen_solver='arpack')
+    # clusterfunc =SpectralClustering(assign_labels="discretize",random_state=0,eigen_solver='arpack',affinity='precomputed_nearest_neighbors',n_clusters=100)
+    # clusters = clusterfunc.fit(sparseMat)
+    # u,counts=np.unique(clusters.labels_,return_counts=True)
+    u, counts = np.unique(labels, return_counts=True)
+
+    algorithmVersion = '1'
+    algorithmName = 'SpectralClustering_200'
+    for clusterID in u:
+        print('Generating results for cluster ', clusterID)
+        # print(clusters.labels_)
+        ims_for_cluster = np.array(allImagePaths)[labels == clusterID]
+        # ims_for_cluster = [allImagePaths[x] for x in clusters.labels_ if x == clusterID ]
+        # print(ims_for_cluster)
+        r1 = filteringResults()
+        bar = progressbar.ProgressBar()
+        for i in bar(range(0, len(ims_for_cluster))):
+            impath = ims_for_cluster[i]
+            imname = os.path.basename(impath)
+            score = 1
+            r1.addScore(imname, score, ID=0)
+        savename = 'cluster' + str(clusterID).zfill(3) + '_size' + str(len(ims_for_cluster)) + '_algorithm_' + algorithmName + '.json'
+        # print(r1)
+        jout = createOutput(savename, r1, algorithmName, algorithmVersion)
+        jout = convertNISTJSON(jout)
+
+        with open(os.path.join(saveFolder, savename), 'w') as fp:
+            fp.write(jout)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--FilteringResultFolder', help='folder containing filtering result jsons')
@@ -135,7 +211,7 @@ parser.add_argument('--ImageRoot', help='Root Image Directory')
 parser.add_argument('--CacheFolder', help='where to save all intermediate files',default='.')
 parser.add_argument('--ImageFileList', help='list of image files')
 parser.add_argument('--OutputFolder', help='output folder')
-parser.add_argument('--ClusterPrefix', help='Prefix for cluster name', default='cluster_')
+parser.add_argument('--Algorithm', help='Markov or Spectral')
 parser.add_argument('--k', help='number of clusters')
 
 args = parser.parse_args()
@@ -145,13 +221,17 @@ dataFolder = args.ImageRoot
 cacheFolder = args.CacheFolder
 allImageFilesPath = args.ImageFileList
 saveFolder = args.OutputFolder
-clusterPrefix = args.ClusterPrefix
+Algorithm = args.Algorithm
 
 numClusters = int(args.k)
 print(f'Clustering with k = {numClusters}...')
 
 make_sure_path_exists(saveFolder)
 make_sure_path_exists(cacheFolder)
+
+files = glob.glob(saveFolder + "/*")
+for f in files:
+    os.remove(f)
 
 
 with open(allImageFilesPath,'r') as fp:
@@ -194,58 +274,18 @@ for r in bar(allJsons):
         d = json.load(fp)
     nodes = d['nodes']
     row = imageIDtoIndex[resultID]
-    #print('nodes: ',len(nodes))
     for n in nodes:
         nid = n['fileid']
         column = imageIDtoIndex[(nid)]
         weight = float(n['nodeConfidenceScore'])
         edgeEndID = imageIDtoIndex[nid]
-        # print(weight)
         totalMat[row,column] = weight
         edgeList.append(str(edgeStartID) + ' ' + str(edgeEndID) + ' ' + str(weight))
         mappedNodes.append(nid)
         edgeWeights.append(weight)
-sparseMat = totalMat.tocsr()
-print('Shape: ', sparseMat.shape)
-print('clustering...')
-amOutPath = os.path.join(cacheFolder,'affinityMatrix')
-save_npz(amOutPath,sparseMat)
 
-labels = spectral_clustering(sparseMat,n_clusters=numClusters,eigen_solver='arpack',random_state=15)
+if Algorithm == "Markov":
+    do_markov_clustering(totalMat, saveFolder)
 
-# labels = spectral_clustering(sparseMat,n_clusters=100,eigen_solver='arpack')
-#clusterfunc =SpectralClustering(assign_labels="discretize",random_state=0,eigen_solver='arpack',affinity='precomputed_nearest_neighbors',n_clusters=100)
-#clusters = clusterfunc.fit(sparseMat)
-#u,counts=np.unique(clusters.labels_,return_counts=True)
-u,counts=np.unique(labels,return_counts=True)
-
-algorithmVersion = '1'
-algorithmName = 'SpectralClustering_200'
-for clusterID in u:
-    print('Generating results for cluster ', clusterID)
-    #print(clusters.labels_)
-    ims_for_cluster = np.array(allImagePaths)[labels == clusterID]
-    #ims_for_cluster = [allImagePaths[x] for x in clusters.labels_ if x == clusterID ]
-    # print(ims_for_cluster)
-    r1 = filteringResults()
-    #print(imageIDtoIndex)
-
-    #resultID = os.path.splitext(os.path.basename(r))[0]
-    row = imageIDtoIndex[os.path.splitext(os.path.basename(ims_for_cluster[0]))[0]]
-    bar = progressbar.ProgressBar()
-
-    for i in bar(range(0, len(ims_for_cluster))):
-        impath = ims_for_cluster[i]
-        imname = os.path.basename(impath)
-
-        col = imageIDtoIndex[(os.path.splitext(imname)[0])]
-        score = totalMat[row, col]
-
-        r1.addScore(imname, score, ID=0)
-    savename = clusterPrefix + str(clusterID).zfill(3) + '_size' + str(len(ims_for_cluster)) + '.json'
-    #print(r1)
-    jout = createOutput(savename, r1)
-    jout = convertNISTJSON(jout)
-
-    with open(os.path.join(saveFolder, savename), 'w') as fp:
-        fp.write(jout)
+if Algorithm == 'Spectral':
+    do_spectral_clustering(totalMat, cacheFolder, saveFolder)
