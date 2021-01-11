@@ -88,7 +88,8 @@ elif args.GenericProbeList is not None:
 numcores = 1
 print(args.outputdir)
 print("beginning dist query")
-distQuery = distributedQuery(args.IndexOutputDir, os.path.join(args.NISTDataset, "world"),indexServerAddress=args.IndexServerAddress,indexServerPort=args.IndexServerPort,tmpDir=args.CacheFolder,indexParamFile=args.TrainedIndexParams,useServer=useServer,det=args.det,desc=args.desc,savefolder=args.outputdir)
+#distQuery = distributedQuery(args.IndexOutputDir, os.path.join(args.NISTDataset, "world"),indexServerAddress=args.IndexServerAddress,indexServerPort=args.IndexServerPort,tmpDir=args.CacheFolder,indexParamFile=args.TrainedIndexParams,useServer=useServer,det=args.det,desc=args.desc,savefolder=args.outputdir)
+distQuery = distributedQuery(args.IndexOutputDir, args.NISTDataset, indexServerAddress=args.IndexServerAddress,indexServerPort=args.IndexServerPort,tmpDir=args.CacheFolder,indexParamFile=args.TrainedIndexParams,useServer=useServer,det=args.det,desc=args.desc,savefolder=args.outputdir)
 print("after dist query")
 provenanceFilter = provenanceFiltering(distQuery)
 print('after provenancefilter')

@@ -542,7 +542,7 @@ class indexConstruction:
         #print('id map size: ', len(self.IDtoNameMap))
         self.IDtoImageSizeMap.extend(np.array(otherProps,dtype=np.int))
         #self.IDtoImageSizeMap[str(self.imCount)] = (int(otherProps[0]),int(otherProps[1])) #Store the image width and height for future use
-        # self.keypointMetadata.extend(meta)
+        self.keypointMetadata.extend(meta)
         if features is not None and len(features) > 0 and len(features.shape) > 1 and features.shape[1] == self.featuredimensions:
             if not self.onlyBuildIDMap:
                 #print('apply dims' ,self.preproc.d_in)

@@ -61,7 +61,7 @@ if [ $RETVAL -ne 0 ]; then
 fi
 
 #Provenance Filtering
-python3 provenanceFilteringDriver.py --GenericProbeList "${indexSavePath}/${datasetName}_randomProbes.txt" --IndexOutputDir "${indexSavePath}/index_${datasetName}/" --ProvenanceOutputFile "${indexSavePath}/results_${datasetName}/results.csv" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --TrainedIndexParams "${indexSavePath}/indextraining_${datasetName}/parameters" --NISTDataset $datasetName --det SURF3 --desc SURF3 --outputdir $indexSavePath --Recall $retrieval_recall &>> $1
+python3 provenanceFilteringDriver.py --GenericProbeList "${indexSavePath}/${datasetName}_randomProbes.txt" --IndexOutputDir "${indexSavePath}/index_${datasetName}/" --ProvenanceOutputFile "${indexSavePath}/results_${datasetName}/results.csv" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --TrainedIndexParams "${indexSavePath}/indextraining_${datasetName}/parameters" --NISTDataset $imageRoot1 --det SURF3 --desc SURF3 --outputdir $indexSavePath --Recall $retrieval_recall &>> $1
 RETVAL=$?
 if [ $RETVAL -ne 0 ]; then
     echo "Failure on provenanceFilteringDriver.py"
