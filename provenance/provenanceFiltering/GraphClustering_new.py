@@ -137,12 +137,30 @@ def convertNISTJSON(results):
 def do_markov_clustering(totalMat, saveFolder):
     nxmat = nx.from_scipy_sparse_matrix(totalMat)
     adj_matrix = nx.to_numpy_matrix(nxmat)
+    centrality_json = filteringResults()
+    for i in range(0, 20):
+        print("Computing centrality: ", i)
+        centralities = dict(nxmat.degree(weight='weight'))
+        sorted_centrality = sorted(centralities.items(), key=lambda item: item [1], reverse=True)[0]
+        image_path = np.array(allImagePaths)[sorted_centrality[0]]
+        image_name = os.path.basename(image_path)
+        score = sorted_centrality[1]
+        centrality_json.addScore(image_name, score)
+        nxmat.remove_node(sorted_centrality[0])
+    algorithmVersion = '1'
+    algorithmName = "Markov"
+    print('starting output creation')
+    centrality_json_output = createOutput('centralities.json', centrality_json, algorithmName, algorithmVersion)
+    print('staring nist conversion')
+    centrality_json_output = convertNISTJSON(centrality_json_output)
+    print('starting save')
+    with open(os.path.join(saveFolder, 'centralities.json'), 'w') as fp:
+        fp.write(centrality_json_output)
+    print("starting mcl")
     res = mcl.run_mcl(adj_matrix)
     clusterID_list = mcl.get_clusters(res)
 
     j = 0
-    algorithmVersion = '1'
-    algorithmName = "Markov"
     for clusterID in clusterID_list:
         clusterID = list(clusterID)
         print('Generating results for cluster ', j)
@@ -283,6 +301,7 @@ for r in bar(allJsons):
         edgeList.append(str(edgeStartID) + ' ' + str(edgeEndID) + ' ' + str(weight))
         mappedNodes.append(nid)
         edgeWeights.append(weight)
+
 
 if Algorithm == "Markov":
     do_markov_clustering(totalMat, saveFolder)

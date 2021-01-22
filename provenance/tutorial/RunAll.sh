@@ -16,7 +16,7 @@ indexSavePath=/home/pthomas4/semafor/semafor_output
 imagelink_folder=/image_link/pro_publica/
 
 #Build list of images
-python3 generateServerDictionary.py $imageRoot1 "${indexSavePath}/${datasetName}" &>> $1
+#python3 generateServerDictionary.py $imageRoot1 "${indexSavePath}/${datasetName}" &>> $1
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on generateServerDictionary"
@@ -24,7 +24,7 @@ python3 generateServerDictionary.py $imageRoot1 "${indexSavePath}/${datasetName}
 #fi
 
 #Feature Extraction
-python3 featureExtractionDriver.py --inputFileList "${indexSavePath}/${datasetName}_filelist.txt" --outputdir $featureFolder --PE 6 --det SURF3 --desc SURF3 --kmax 5000 --jobNum 0 --numJobs 1 &>> $1
+#python3 featureExtractionDriver.py --inputFileList "${indexSavePath}/${datasetName}_filelist.txt" --outputdir $featureFolder --PE 6 --det SURF3 --desc SURF3 --kmax 5000 --jobNum 0 --numJobs 1
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on featureExtractionDriver.py"
@@ -32,7 +32,7 @@ python3 featureExtractionDriver.py --inputFileList "${indexSavePath}/${datasetNa
 #fi
 
 #Feature Directory Indexing
-python3 generateServerDictionary.py $featureFolder "${indexSavePath}/${datasetName}_features" &>> $1
+#python3 generateServerDictionary.py $featureFolder "${indexSavePath}/${datasetName}_features" &>> $1
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on generateServerDictionary.py round 2"
@@ -40,7 +40,7 @@ python3 generateServerDictionary.py $featureFolder "${indexSavePath}/${datasetNa
 #fi
 
 #Index Training
-python3 indexTrainingDriver.py --FeatureFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --IndexOutputFile "${indexSavePath}/indextraining_${datasetName}/parameters" &>> $1
+#python3 indexTrainingDriver.py --FeatureFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --IndexOutputFile "${indexSavePath}/indextraining_${datasetName}/parameters" &>> $1
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on indexTrainingDriver.py"
@@ -48,14 +48,14 @@ python3 indexTrainingDriver.py --FeatureFileList "${indexSavePath}/${datasetName
 #fi
 
 #Index Construction
-python3 indexConstructionDriver.py --FeatureFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --IndexOutputFile "${indexSavePath}/index_${datasetName}/" --TrainedIndexParams "${indexSavePath}/indextraining_${datasetName}/parameters" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --GPUCount 1 &>> $1
+#python3 indexConstructionDriver.py --FeatureFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --IndexOutputFile "${indexSavePath}/index_${datasetName}/" --TrainedIndexParams "${indexSavePath}/indextraining_${datasetName}/parameters" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --GPUCount 1 &>> $1
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on indexConstructionDriver.py"
 #    exit 1
 #fi
 
-python3 generateRandomProbeList.py --ImageList "${indexSavePath}/${datasetName}_filelist.txt" --OutputProbeList "${indexSavePath}/${datasetName}_randomProbes.txt" --NumSamples $index_sample &>> $1
+#python3 generateRandomProbeList.py --ImageList "${indexSavePath}/${datasetName}_filelist.txt" --OutputProbeList "${indexSavePath}/${datasetName}_randomProbes.txt" --NumSamples $index_sample &>> $1
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on generateRandomProbeList.py"
@@ -63,7 +63,7 @@ python3 generateRandomProbeList.py --ImageList "${indexSavePath}/${datasetName}_
 #fi
 
 #Provenance Filtering
-python3 provenanceFilteringDriver.py --GenericProbeList "${indexSavePath}/${datasetName}_randomProbes.txt" --IndexOutputDir "${indexSavePath}/index_${datasetName}/" --ProvenanceOutputFile "${indexSavePath}/results_${datasetName}/results.csv" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --TrainedIndexParams "${indexSavePath}/indextraining_${datasetName}/parameters" --NISTDataset $imageRoot1 --det SURF3 --desc SURF3 --outputdir $indexSavePath --Recall $retrieval_recall &>> $1
+#python3 provenanceFilteringDriver.py --GenericProbeList "${indexSavePath}/${datasetName}_randomProbes.txt" --IndexOutputDir "${indexSavePath}/index_${datasetName}/" --ProvenanceOutputFile "${indexSavePath}/results_${datasetName}/results.csv" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --TrainedIndexParams "${indexSavePath}/indextraining_${datasetName}/parameters" --NISTDataset $imageRoot1 --det SURF3 --desc SURF3 --outputdir $indexSavePath --Recall $retrieval_recall
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on provenanceFilteringDriver.py"
@@ -71,7 +71,8 @@ python3 provenanceFilteringDriver.py --GenericProbeList "${indexSavePath}/${data
 #fi
 
 #Motif Clustering
-python3 ../provenanceFiltering/GraphClustering_new.py --FilteringResultFolder "${indexSavePath}/results_${datasetName}/json" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --ImageRoot $imageRoot1 --ImageFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --OutputFolder "${indexSavePath}/results_${datasetName}/motifClusters" --k $motif_clusters --Algorithm Markov &>> $1
+python3 ../provenanceFiltering/GraphClustering_new.py --FilteringResultFolder "${indexSavePath}/results_${datasetName}/json" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --ImageRoot $imageRoot1 --ImageFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --OutputFolder "${indexSavePath}/results_${datasetName}/motifClusters" --k $motif_clusters --Algorithm Markov
+#python3 ../provenanceFiltering/GraphClustering_new.py --FilteringResultFolder "${indexSavePath}/results_${datasetName}/json" --CacheFolder "${indexSavePath}/cache_${datasetName}/" --ImageRoot $imageRoot1 --ImageFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --OutputFolder "${indexSavePath}/results_${datasetName}/motifClusters" --k $motif_clusters --Algorithm Markov &>> $1
 #RETVAL=$?
 #if [ $RETVAL -ne 0 ]; then
 #    echo "Failure on GraphClustering_new.py"
@@ -80,8 +81,8 @@ python3 ../provenanceFiltering/GraphClustering_new.py --FilteringResultFolder "$
 
 #Cluster Visualization
 python3 ../helperLibraries/visualizeFilterResultsNew.py --clusters "${indexSavePath}/results_${datasetName}/motifClusters" --folder ${imagelink_folder} --datasetName ${datasetName} --filedict "${indexSavePath}/${datasetName}_pathmap.json" --outputDir "${indexSavePath}/results_${datasetName}/clustervis" --recall $retrieval_recall
-RETVAL=$?
-if [ $RETVAL -ne 0 ]; then
-    echo "Failure on visualizeFilterResultsNew.py"
-    exit 1
-fi
+#RETVAL=$?
+#if [ $RETVAL -ne 0 ]; then
+#    echo "Failure on visualizeFilterResultsNew.py"
+#    exit 1
+#fi
