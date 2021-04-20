@@ -21,14 +21,6 @@ if [ $RETVAL -ne 0 ]; then
     exit 1
 fi
 
-#Feature Directory Indexing
-#python3 generateServerDictionary.py $featureFolder "${indexSavePath}/${datasetName}_features" &>> $1
-#RETVAL=$?
-#if [ $RETVAL -ne 0 ]; then
-#    echo "Failure on generateServerDictionary.py round 2"
-#    exit 1
-#fi
-
 #Index Training
 #python3 indexTrainingDriver.py --FeatureFileList "${indexSavePath}/${datasetName}_features_filelist.txt" --IndexOutputFile "${indexSavePath}/indextraining_${datasetName}/parameters" &>> $1
 #RETVAL=$?
